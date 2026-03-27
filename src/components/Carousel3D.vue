@@ -48,6 +48,7 @@ const currentX = ref(0);
 const hoverCount = ref(0);
 
 const sensitivity = 0.0032;
+const cameraOffsetX = 60;
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(50, 1, 1, 5000);
 let renderer: CSS3DRenderer;
@@ -389,6 +390,8 @@ onMounted(() => {
 
   camera.position.z = 560;
   camera.position.y = 0;
+  camera.position.x = cameraOffsetX;
+  camera.lookAt(0, 0, 0);
 
   carousel = new THREE.Object3D();
   scene.add(carousel);

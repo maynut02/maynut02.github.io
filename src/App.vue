@@ -4,7 +4,7 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import Carousel3D from "@/components/Carousel3D.vue";
 
 const supportsFinePointer = ref(true);
-const hoveredInteractiveElement = ref<HTMLElement | null>(null);
+const outlinedInteractiveElement = ref<HTMLElement | null>(null);
 
 const cursorState = reactive({
   x: 0,
@@ -32,7 +32,7 @@ const cursorStyle = computed(() => ({
 
 const cursorDotStyle = computed(() => ({
   transform: `translate3d(${cursorState.targetX}px, ${cursorState.targetY}px, 0) translate(-50%, -50%) scale(${cursorState.pressed ? 0.8 : 1})`,
-  opacity: cursorState.visible && !cursorState.interactive ? "1" : "0",
+  opacity: cursorState.visible ? "1" : "0",
 }));
 
 function updatePointerTarget(clientX: number, clientY: number) {
@@ -40,24 +40,27 @@ function updatePointerTarget(clientX: number, clientY: number) {
   cursorState.targetY = clientY;
 }
 
-function setTargetAsPointerCircle() {
-  cursorState.interactive = false;
-  cursorState.targetWidth = 28;
-  cursorState.targetHeight = 28;
+function setTargetAsPointerCircle(interactive: boolean) {
+  cursorState.interactive = interactive;
+  cursorState.targetWidth = interactive ? 24 : 28;
+  cursorState.targetHeight = interactive ? 24 : 28;
   cursorState.targetRadius = 999;
 }
 
-function setTargetAsElementRect(element: HTMLElement) {
-  const rect = element.getBoundingClientRect();
-  const style = window.getComputedStyle(element);
-  const radius = Number.parseFloat(style.borderTopLeftRadius) || 10;
-  const pad = 6;
+function setOutlinedElement(element: HTMLElement | null) {
+  if (outlinedInteractiveElement.value === element) {
+    return;
+  }
 
-  cursorState.interactive = true;
-  updatePointerTarget(rect.left + rect.width / 2, rect.top + rect.height / 2);
-  cursorState.targetWidth = rect.width + pad * 2;
-  cursorState.targetHeight = rect.height + pad * 2;
-  cursorState.targetRadius = Math.max(12, radius + pad);
+  if (outlinedInteractiveElement.value && outlinedInteractiveElement.value.isConnected) {
+    outlinedInteractiveElement.value.classList.remove("cursor-outline-active");
+  }
+
+  outlinedInteractiveElement.value = element;
+
+  if (element) {
+    element.classList.add("cursor-outline-active");
+  }
 }
 
 function getInteractiveElement(target: EventTarget | null) {
@@ -74,14 +77,14 @@ function getInteractiveElement(target: EventTarget | null) {
 
 function handlePointerMove(event: PointerEvent) {
   const interactiveElement = getInteractiveElement(event.target);
+  updatePointerTarget(event.clientX, event.clientY);
 
   if (interactiveElement) {
-    hoveredInteractiveElement.value = interactiveElement;
-    setTargetAsElementRect(interactiveElement);
+    setOutlinedElement(interactiveElement);
+    setTargetAsPointerCircle(true);
   } else {
-    hoveredInteractiveElement.value = null;
-    updatePointerTarget(event.clientX, event.clientY);
-    setTargetAsPointerCircle();
+    setOutlinedElement(null);
+    setTargetAsPointerCircle(false);
   }
 
   cursorState.visible = true;
@@ -97,8 +100,8 @@ function handlePointerUp() {
 
 function handlePointerLeave() {
   cursorState.visible = false;
-  cursorState.interactive = false;
-  hoveredInteractiveElement.value = null;
+  setTargetAsPointerCircle(false);
+  setOutlinedElement(null);
 }
 
 function handlePointerEnter(event: PointerEvent) {
@@ -110,10 +113,6 @@ let cursorRafId: number | null = null;
 let pointerQuery: MediaQueryList | null = null;
 
 function animateCursor() {
-  if (hoveredInteractiveElement.value && hoveredInteractiveElement.value.isConnected) {
-    setTargetAsElementRect(hoveredInteractiveElement.value);
-  }
-
   cursorState.x += (cursorState.targetX - cursorState.x) * 0.2;
   cursorState.y += (cursorState.targetY - cursorState.y) * 0.2;
   cursorState.width += (cursorState.targetWidth - cursorState.width) * 0.18;
@@ -137,6 +136,7 @@ function mountCursor() {
   cursorState.targetHeight = 28;
   cursorState.radius = 999;
   cursorState.targetRadius = 999;
+  cursorState.interactive = false;
 
   window.addEventListener("pointermove", handlePointerMove);
   window.addEventListener("pointerdown", handlePointerDown);
@@ -162,8 +162,8 @@ function unmountCursor() {
   }
 
   cursorState.visible = false;
-  cursorState.interactive = false;
-  hoveredInteractiveElement.value = null;
+  setTargetAsPointerCircle(false);
+  setOutlinedElement(null);
 }
 
 function handlePointerModeChange(event: MediaQueryListEvent) {
@@ -194,6 +194,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   unmountCursor();
+  setOutlinedElement(null);
 
   if (!pointerQuery) {
     return;
@@ -218,7 +219,10 @@ onBeforeUnmount(() => {
         :class="['smooth-cursor-shell', { 'smooth-cursor-shell--interactive': cursorState.interactive }]"
         :style="cursorStyle"
       />
-      <div class="smooth-cursor-dot" :style="cursorDotStyle" />
+      <div
+        :class="['smooth-cursor-dot', { 'smooth-cursor-dot--interactive': cursorState.interactive }]"
+        :style="cursorDotStyle"
+      />
     </div>
   </main>
 </template>

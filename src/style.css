@@ -161,12 +161,8 @@ html.light {
 }
 
 .smooth-cursor-shell--interactive {
-  border: 1px solid oklch(1 0 0 / 0.95);
-  outline: 1px solid oklch(1 0 0 / 0.5);
-  outline-offset: 4px;
-  box-shadow:
-    0 0 0 1px oklch(0 0 0 / 0.45) inset,
-    0 8px 26px oklch(0 0 0 / 0.32);
+  border: 1px solid oklch(0.95 0 0 / 0.75);
+  box-shadow: 0 0 0 1px oklch(0 0 0 / 0.46) inset;
 }
 
 .smooth-cursor-dot {
@@ -180,4 +176,14 @@ html.light {
   box-shadow: 0 0 14px oklch(1 0 0 / 0.8);
   transition: opacity 160ms ease;
   will-change: transform;
+}
+
+.smooth-cursor-dot--interactive {
+  background: oklch(0.74 0 0);
+  box-shadow: 0 0 10px oklch(0.72 0 0 / 0.45);
+}
+
+.cursor-outline-active {
+  outline: 2px solid oklch(0.98 0 0 / 0.95);
+  outline-offset: 6px;
 }
