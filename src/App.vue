@@ -1,34 +1,62 @@
 ﻿<script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
+import StarsBackground from "./components/StarsBackground.vue";
 import MorphingRevealLink from "./components/MorphingRevealLink.vue";
 import RadiantText from "./components/RadiantText.vue";
 import SmoothCursor from "./components/SmoothCursor.vue";
 
-const links = [
-  {
-    href: "https://www.youtube.com/@MayNut",
-    texts: ["메이넛 유튜브 채널", "youtube.com/@MayNut"],
-  },
-  {
-    href: "https://discord.gg/7pNGhZcCQH",
-    texts: ["신작탐험대 디스코드 서버", "discord.gg/7pNGhZcCQH"],
-  },
+const siteLinks = [
   {
     href: "https://astral.maynutlab.com",
     texts: ["아스트랄 파티 한글패치", "astral.maynutlab.com"],
+    enableNavigateReveal: true,
   },
   {
     href: "https://arkchess.maynutlab.com",
     texts: ["위수 협의: 맹약/하반기 도감", "arkchess.maynutlab.com"],
+    enableNavigateReveal: true,
   },
   {
     href: "https://thumbnail.maynutlab.com",
     texts: ["유튜브 썸네일 메이커", "thumbnail.maynutlab.com"],
+    enableNavigateReveal: true,
+  },
+];
+
+const userLinks = [
+  {
+    href: "https://www.youtube.com/@MayNut",
+    texts: ["메이넛 유튜브 채널", "youtube.com/@MayNut"],
+    enableNavigateReveal: true,
+  },
+  {
+    href: "https://discord.gg/7pNGhZcCQH",
+    texts: ["신작탐험대 디스코드 서버", "discord.gg/7pNGhZcCQH"],
+    enableNavigateReveal: true,
   },
   {
     href: "mailto:connect@maynutlab.com",
     texts: ["Connect", "connect@maynutlab.com"],
     enableNavigateReveal: false,
+  },
+];
+
+const footerLinks = [
+  {
+    href: "https://github.com/maynut02",
+    text: "GitHub",
+  },
+  {
+    href: "https://x.com/_maynut",
+    text: "X",
+  },
+  {
+    href: "https://www.youtube.com/@MayNut",
+    text: "YouTube",
+  },
+  {
+    href: "https://chzzk.naver.com/34464631b6bf3b546109fd6e0afd0456",
+    text: "Chzzk",
   },
 ];
 
@@ -85,11 +113,28 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <main class="flex flex-col min-h-svh w-full pt-20">
+  <StarsBackground
+    class="pointer-events-none fixed inset-0 z-0 opacity-70"
+    star-color="#ffffff"
+    :speed="65"
+    :factor="0.035"
+  />
+
+  <main class="relative z-10 flex flex-col min-h-svh w-full pt-20 bg-black/30">
     <div class="relative flex flex-1 items-center justify-center rounded-4xl">
       <div class="flex w-full flex-col text-center text-2xl md:text-4xl">
         <MorphingRevealLink
-          v-for="item in links"
+          v-for="item in siteLinks"
+          :key="item.href"
+          :href="item.href"
+          :texts="item.texts"
+          :enable-navigate-reveal="item.enableNavigateReveal ?? true"
+        />
+
+        <div class="border-y my-4 mx-8 md:mx-16 bg-foreground" />
+
+        <MorphingRevealLink
+          v-for="item in userLinks"
           :key="item.href"
           :href="item.href"
           :texts="item.texts"
@@ -101,10 +146,14 @@ onUnmounted(() => {
     <div class="flex flex-col gap-2 items-center pb-4 pt-20 text-xs">
       <span class="text-neutral-600">Copyright 2026. MayNut All rights reserved.</span>
       <div class="flex gap-4 items-center">
-        <a href="https://github.com/maynut02" target="_blank" class="text-neutral-500 hover:bg-foreground transition-colors underline underline-offset-4">GitHub</a>
-        <a href="https://x.com/_maynut" target="_blank" class="text-neutral-500 hover:bg-foreground transition-colors underline underline-offset-4">X</a>
-        <a href="https://www.youtube.com/@MayNut" target="_blank" class="text-neutral-500 hover:bg-foreground transition-colors underline underline-offset-4">YouTube</a>
-        <a href="https://chzzk.naver.com/34464631b6bf3b546109fd6e0afd0456" target="_blank" class="text-neutral-500 hover:bg-foreground transition-colors underline underline-offset-4">Chzzk</a>
+        <a 
+          v-for="link in footerLinks" 
+          :href="link.href" 
+          target="_blank" 
+          class="text-neutral-500 hover:bg-foreground transition-colors duration-300 underline underline-offset-4"
+        >
+          {{ link.text }}
+        </a>
       </div>
     </div>
   </main>
@@ -122,7 +171,7 @@ onUnmounted(() => {
         class="inline-flex items-center justify-center px-4 py-1 transition ease-out"
         :duration="5"
       >
-        <span class="pointer-events-none text-3xl">MayNut</span>
+        <span class="pointer-events-none text-xl md:text-3xl">MayNut</span>
       </RadiantText>
     </Transition>
   </div>
