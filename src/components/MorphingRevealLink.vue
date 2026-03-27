@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
-import MorphingText from "./MorphingText.vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 
 interface Props {
   href: string;
@@ -8,13 +7,11 @@ interface Props {
   target?: string;
   rel?: string;
   class?: string;
-  morphTime?: number;
   enableNavigateReveal?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   target: "_self",
-  morphTime: 0.65,
   enableNavigateReveal: true,
 });
 
@@ -23,10 +20,14 @@ const isHovered = ref(false);
 const isTouchArmed = ref(false);
 const isNavigating = ref(false);
 const navigationOverlayStyle = ref<Record<string, string>>({});
+const displayText = ref("");
+const isTextVisible = ref(true);
 
 let navigateTimeoutId = 0;
+let textSwapTimeoutId = 0;
 
 const NAV_REVEAL_DURATION_MS = 520;
+const TEXT_FADE_DURATION_MS = 300;
 
 function isTouchDevice() {
   return window.matchMedia("(hover: none) and (pointer: coarse)").matches;
@@ -41,6 +42,35 @@ function resetNavigationState() {
   isNavigating.value = false;
   navigationOverlayStyle.value = {};
   window.clearTimeout(navigateTimeoutId);
+}
+
+function getTargetText() {
+  if (props.texts.length === 0) return "";
+  if (props.texts.length === 1) return props.texts[0];
+  return isHovered.value ? props.texts[1] : props.texts[0];
+}
+
+function syncTextImmediately() {
+  window.clearTimeout(textSwapTimeoutId);
+  displayText.value = getTargetText();
+  isTextVisible.value = true;
+}
+
+function animateTextSwap() {
+  const nextText = getTargetText();
+  window.clearTimeout(textSwapTimeoutId);
+
+  if (!displayText.value) {
+    displayText.value = nextText;
+    isTextVisible.value = true;
+    return;
+  }
+
+  isTextVisible.value = false;
+  textSwapTimeoutId = window.setTimeout(() => {
+    displayText.value = nextText;
+    isTextVisible.value = true;
+  }, TEXT_FADE_DURATION_MS);
 }
 
 function shouldBypassCustomNavigation(event: MouseEvent) {
@@ -106,6 +136,14 @@ function handleLinkClick(event: MouseEvent) {
   triggerRevealAndNavigate(event, anchor);
 }
 
+function handleLinkPointerDown() {
+  if (!isTouchDevice()) return;
+  if (isTouchArmed.value) return;
+
+  // Start visual feedback immediately on touch devices (before click fires).
+  isHovered.value = true;
+}
+
 function handleDocumentPointerDown(event: PointerEvent) {
   if (!isTouchArmed.value || !isTouchDevice()) return;
 
@@ -116,15 +154,32 @@ function handleDocumentPointerDown(event: PointerEvent) {
 }
 
 onMounted(() => {
+  syncTextImmediately();
   window.addEventListener("pointerdown", handleDocumentPointerDown, true);
   window.addEventListener("pageshow", handlePageShow);
 });
 
 onUnmounted(() => {
   resetNavigationState();
+  window.clearTimeout(textSwapTimeoutId);
   window.removeEventListener("pointerdown", handleDocumentPointerDown, true);
   window.removeEventListener("pageshow", handlePageShow);
 });
+
+watch(
+  () => isHovered.value,
+  () => {
+    animateTextSwap();
+  },
+);
+
+watch(
+  () => props.texts,
+  () => {
+    syncTextImmediately();
+  },
+  { deep: true },
+);
 </script>
 
 <template>
@@ -138,22 +193,28 @@ onUnmounted(() => {
     @mouseleave="!isTouchArmed && (isHovered = false)"
     @focusin="isHovered = true"
     @focusout="!isTouchArmed && (isHovered = false)"
+    @pointerdown="handleLinkPointerDown"
     @click="handleLinkClick"
   >
     <span
       aria-hidden="true"
       :class="[
-        'absolute inset-0 bg-foreground py-1 origin-center transition-transform duration-500 ease-out',
-        isHovered ? 'scale-x-100' : 'scale-x-0',
+        'absolute bottom-0 top-0 bg-foreground py-1 transition-[left,width] duration-500 ease-out',
+        isHovered ? 'left-0 w-full' : 'left-1/2 w-0',
       ]"
     />
     <span
       :class="[
-        'relative z-10 flex h-full items-center py-1 transition-colors duration-500',
+        'relative z-10 flex h-full justify-center items-center py-1 transition-colors duration-500',
         isHovered ? 'text-background' : '',
       ]"
     >
-      <MorphingText class="py-1" :texts="props.texts" :active="isHovered" :morph-time="props.morphTime" />
+      <span
+        class="inline-flex w-full items-center justify-center transition-opacity duration-300"
+        :class="isTextVisible ? 'opacity-100' : 'opacity-0'"
+      >
+        {{ displayText }}
+      </span>
     </span>
   </a>
 
