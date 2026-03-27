@@ -98,8 +98,14 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div class="flex justify-center pb-4 pt-20">
-      <span class="text-neutral-600 text-xs">Copyright 2026. MayNut All rights reserved.</span>
+    <div class="flex flex-col gap-2 items-center pb-4 pt-20 text-xs">
+      <span class="text-neutral-600">Copyright 2026. MayNut All rights reserved.</span>
+      <div class="flex gap-4 items-center">
+        <a href="https://github.com/maynut02" target="_blank" class="text-neutral-500 hover:bg-foreground transition-colors underline underline-offset-4">GitHub</a>
+        <a href="https://x.com/_maynut" target="_blank" class="text-neutral-500 hover:bg-foreground transition-colors underline underline-offset-4">X</a>
+        <a href="https://www.youtube.com/@MayNut" target="_blank" class="text-neutral-500 hover:bg-foreground transition-colors underline underline-offset-4">YouTube</a>
+        <a href="https://chzzk.naver.com/34464631b6bf3b546109fd6e0afd0456" target="_blank" class="text-neutral-500 hover:bg-foreground transition-colors underline underline-offset-4">Chzzk</a>
+      </div>
     </div>
   </main>
 

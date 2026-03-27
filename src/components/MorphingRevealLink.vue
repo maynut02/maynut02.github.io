@@ -142,9 +142,17 @@ onUnmounted(() => {
   >
     <span
       aria-hidden="true"
-      class="absolute inset-0 bg-foreground py-1 origin-center scale-x-0 transition-transform duration-500 ease-out group-hover:scale-x-100 group-focus-within:scale-x-100"
+      :class="[
+        'absolute inset-0 bg-foreground py-1 origin-center transition-transform duration-500 ease-out',
+        isHovered ? 'scale-x-100' : 'scale-x-0',
+      ]"
     />
-    <span class="relative z-10 flex h-full items-center py-1 transition-colors duration-500 group-hover:text-background group-focus-within:text-background">
+    <span
+      :class="[
+        'relative z-10 flex h-full items-center py-1 transition-colors duration-500',
+        isHovered ? 'text-background' : '',
+      ]"
+    >
       <MorphingText class="py-1" :texts="props.texts" :active="isHovered" :morph-time="props.morphTime" />
     </span>
   </a>
