@@ -1,10 +1,10 @@
 ﻿<script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from "vue";
 
-import Carousel3D from "@/components/Carousel3D.vue";
+import ParticlesBg from "@/components/ParticlesBg.vue";
 
 const supportsFinePointer = ref(true);
-const outlinedInteractiveElement = ref<HTMLElement | null>(null);
+const hoveredInteractiveElement = ref<HTMLElement | null>(null);
 
 const cursorState = reactive({
   x: 0,
@@ -47,20 +47,17 @@ function setTargetAsPointerCircle(interactive: boolean) {
   cursorState.targetRadius = 999;
 }
 
-function setOutlinedElement(element: HTMLElement | null) {
-  if (outlinedInteractiveElement.value === element) {
-    return;
-  }
+function setTargetAsElementRect(element: HTMLElement) {
+  const rect = element.getBoundingClientRect();
+  const style = window.getComputedStyle(element);
+  const radius = Number.parseFloat(style.borderTopLeftRadius) || 12;
+  const pad = 6;
 
-  if (outlinedInteractiveElement.value && outlinedInteractiveElement.value.isConnected) {
-    outlinedInteractiveElement.value.classList.remove("cursor-outline-active");
-  }
-
-  outlinedInteractiveElement.value = element;
-
-  if (element) {
-    element.classList.add("cursor-outline-active");
-  }
+  cursorState.interactive = true;
+  updatePointerTarget(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  cursorState.targetWidth = rect.width + pad * 2;
+  cursorState.targetHeight = rect.height + pad * 2;
+  cursorState.targetRadius = Math.max(12, radius + pad);
 }
 
 function getInteractiveElement(target: EventTarget | null) {
@@ -77,13 +74,13 @@ function getInteractiveElement(target: EventTarget | null) {
 
 function handlePointerMove(event: PointerEvent) {
   const interactiveElement = getInteractiveElement(event.target);
-  updatePointerTarget(event.clientX, event.clientY);
 
   if (interactiveElement) {
-    setOutlinedElement(interactiveElement);
-    setTargetAsPointerCircle(true);
+    hoveredInteractiveElement.value = interactiveElement;
+    setTargetAsElementRect(interactiveElement);
   } else {
-    setOutlinedElement(null);
+    hoveredInteractiveElement.value = null;
+    updatePointerTarget(event.clientX, event.clientY);
     setTargetAsPointerCircle(false);
   }
 
@@ -101,7 +98,7 @@ function handlePointerUp() {
 function handlePointerLeave() {
   cursorState.visible = false;
   setTargetAsPointerCircle(false);
-  setOutlinedElement(null);
+  hoveredInteractiveElement.value = null;
 }
 
 function handlePointerEnter(event: PointerEvent) {
@@ -113,6 +110,10 @@ let cursorRafId: number | null = null;
 let pointerQuery: MediaQueryList | null = null;
 
 function animateCursor() {
+  if (hoveredInteractiveElement.value && hoveredInteractiveElement.value.isConnected) {
+    setTargetAsElementRect(hoveredInteractiveElement.value);
+  }
+
   cursorState.x += (cursorState.targetX - cursorState.x) * 0.2;
   cursorState.y += (cursorState.targetY - cursorState.y) * 0.2;
   cursorState.width += (cursorState.targetWidth - cursorState.width) * 0.18;
@@ -163,7 +164,7 @@ function unmountCursor() {
 
   cursorState.visible = false;
   setTargetAsPointerCircle(false);
-  setOutlinedElement(null);
+  hoveredInteractiveElement.value = null;
 }
 
 function handlePointerModeChange(event: MediaQueryListEvent) {
@@ -194,7 +195,6 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   unmountCursor();
-  setOutlinedElement(null);
 
   if (!pointerQuery) {
     return;
@@ -209,10 +209,8 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <main
-    class="relative h-svh w-full overflow-hidden bg-[radial-gradient(circle_at_18%_20%,_oklch(0.37_0.08_285/.55),_transparent_36%),radial-gradient(circle_at_82%_12%,_oklch(0.35_0.1_215/.5),_transparent_38%),radial-gradient(circle_at_50%_100%,_oklch(0.29_0.08_90/.5),_transparent_45%)]"
-  >
-    <Carousel3D class="h-full w-full" />
+  <main class="relative h-svh w-full overflow-hidden bg-background">
+    <ParticlesBg class="absolute inset-0" color="#FFFFFF" :quantity="110" :ease="90" :staticity="14" />
 
     <div v-if="supportsFinePointer" class="pointer-events-none fixed inset-0 z-[120]">
       <div
