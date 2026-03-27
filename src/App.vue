@@ -19,6 +19,7 @@ const cursorState = reactive({
   targetRadius: 999,
   visible: false,
   pressed: false,
+  interactive: false,
 });
 
 const cursorStyle = computed(() => ({
@@ -31,7 +32,7 @@ const cursorStyle = computed(() => ({
 
 const cursorDotStyle = computed(() => ({
   transform: `translate3d(${cursorState.targetX}px, ${cursorState.targetY}px, 0) translate(-50%, -50%) scale(${cursorState.pressed ? 0.8 : 1})`,
-  opacity: cursorState.visible ? "1" : "0",
+  opacity: cursorState.visible && !cursorState.interactive ? "1" : "0",
 }));
 
 function updatePointerTarget(clientX: number, clientY: number) {
@@ -40,6 +41,7 @@ function updatePointerTarget(clientX: number, clientY: number) {
 }
 
 function setTargetAsPointerCircle() {
+  cursorState.interactive = false;
   cursorState.targetWidth = 28;
   cursorState.targetHeight = 28;
   cursorState.targetRadius = 999;
@@ -47,12 +49,15 @@ function setTargetAsPointerCircle() {
 
 function setTargetAsElementRect(element: HTMLElement) {
   const rect = element.getBoundingClientRect();
-  const pad = 8;
+  const style = window.getComputedStyle(element);
+  const radius = Number.parseFloat(style.borderTopLeftRadius) || 10;
+  const pad = 6;
 
+  cursorState.interactive = true;
   updatePointerTarget(rect.left + rect.width / 2, rect.top + rect.height / 2);
   cursorState.targetWidth = rect.width + pad * 2;
   cursorState.targetHeight = rect.height + pad * 2;
-  cursorState.targetRadius = Math.max(14, rect.height / 2 + 8);
+  cursorState.targetRadius = Math.max(12, radius + pad);
 }
 
 function getInteractiveElement(target: EventTarget | null) {
@@ -92,6 +97,7 @@ function handlePointerUp() {
 
 function handlePointerLeave() {
   cursorState.visible = false;
+  cursorState.interactive = false;
   hoveredInteractiveElement.value = null;
 }
 
@@ -156,6 +162,7 @@ function unmountCursor() {
   }
 
   cursorState.visible = false;
+  cursorState.interactive = false;
   hoveredInteractiveElement.value = null;
 }
 
@@ -207,7 +214,10 @@ onBeforeUnmount(() => {
     <Carousel3D class="h-full w-full" />
 
     <div v-if="supportsFinePointer" class="pointer-events-none fixed inset-0 z-[120]">
-      <div class="smooth-cursor-shell" :style="cursorStyle" />
+      <div
+        :class="['smooth-cursor-shell', { 'smooth-cursor-shell--interactive': cursorState.interactive }]"
+        :style="cursorStyle"
+      />
       <div class="smooth-cursor-dot" :style="cursorDotStyle" />
     </div>
   </main>

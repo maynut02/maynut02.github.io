@@ -121,7 +121,7 @@ function updateNodesLayout() {
   const height = carouselContainer.value.clientHeight;
   const cardSize = getCardSize(width, height);
 
-  radius.value = Math.max(width, height) * (width < 768 ? 0.78 : 0.66);
+  radius.value = Math.max(width, height) * (width < 768 ? 0.74 : 0.62);
 
   nodes.forEach((node) => {
     node.element.style.width = `${cardSize.width}px`;
@@ -388,7 +388,7 @@ onMounted(() => {
   carouselContainer.value.appendChild(renderer.domElement);
 
   camera.position.z = 560;
-  camera.position.y = 70;
+  camera.position.y = 0;
 
   carousel = new THREE.Object3D();
   scene.add(carousel);
@@ -399,7 +399,7 @@ onMounted(() => {
     carousel.add(node.object);
   });
 
-  carousel.rotation.x = THREE.MathUtils.degToRad(18);
+  carousel.rotation.x = 0;
 
   updateNodesLayout();
   startContinuousRotation();
