@@ -27,8 +27,8 @@
 }
 
 .dark {
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.985 0 0);
+  --background: oklch(0.2 0 0);
+  --foreground: oklch(0.84 0 0);
   --card: oklch(0.141 0.005 285.823);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.141 0.005 285.823);
@@ -82,11 +82,12 @@
   html,
   body,
   #app {
-    @apply h-svh w-full overflow-hidden;
+    @apply h-svh w-full;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
+    overscroll-behavior: none;
   }
 }
 
@@ -94,4 +95,15 @@ html,
 html.dark,
 html.light {
   color-scheme: dark;
+}
+
+@font-face {
+    font-family: 'Watermelon';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2210-EF@1.0/EF_watermelonSalad.woff2') format('woff2');
+    font-weight: normal;
+    font-display: swap;
+}
+
+body {
+  font-family: 'Watermelon', sans-serif;
 }
