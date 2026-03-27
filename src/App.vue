@@ -1,23 +1,22 @@
 ﻿<script setup lang="ts">
-import { computed } from "vue";
-import { motion } from "motion-v";
-import { useDark, useToggle } from "@vueuse/core";
+import Carousel3D from "@/components/Carousel3D.vue";
 
-const isDark = useDark({
-  selector: "html",
-  attribute: "class",
-  valueDark: "dark",
-  valueLight: "light",
-});
-
-const toggleDark = useToggle(isDark);
-const modeText = computed(() => (isDark.value ? "Dark" : "Light"));
+const items = [
+  "https://images.pexels.com/photos/799443/pexels-photo-799443.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "https://images.pexels.com/photos/16245254/pexels-photo-16245254/free-photo-of-chatgpt-a-chatbot-for-your-website.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "https://images.pexels.com/photos/1910236/pexels-photo-1910236.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "https://images.pexels.com/photos/2832382/pexels-photo-2832382.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "https://images.pexels.com/photos/2333293/pexels-photo-2333293.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "https://images.pexels.com/photos/604684/pexels-photo-604684.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "https://images.pexels.com/photos/3308588/pexels-photo-3308588.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+  "https://images.pexels.com/photos/2860807/pexels-photo-2860807.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
+];
 </script>
 
 <template>
-  <main class="h-svh w-full overflow-hidden">
-    <section class="relative grid h-full w-full place-items-center">
-      
-    </section>
+  <main class="size-full bg-background">
+    <div class="flex size-full overflow-hidden py-12">
+      <Carousel3D :items="items" :width="450" :height="600" />
+    </div>
   </main>
 </template>

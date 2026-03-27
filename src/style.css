@@ -90,14 +90,8 @@
   }
 }
 
-html {
-  color-scheme: light dark;
-}
-
-html.dark {
-  color-scheme: dark;
-}
-
+html,
+html.dark,
 html.light {
-  color-scheme: light;
+  color-scheme: dark;
 }
