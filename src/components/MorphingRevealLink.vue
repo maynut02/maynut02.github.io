@@ -9,11 +9,13 @@ interface Props {
   rel?: string;
   class?: string;
   morphTime?: number;
+  enableNavigateReveal?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   target: "_self",
   morphTime: 0.65,
+  enableNavigateReveal: true,
 });
 
 const linkRef = ref<HTMLAnchorElement | null>(null);
@@ -46,6 +48,13 @@ function shouldBypassCustomNavigation(event: MouseEvent) {
 }
 
 function triggerRevealAndNavigate(event: MouseEvent, anchor: HTMLAnchorElement) {
+  if (!props.enableNavigateReveal) {
+    resetTouchState();
+    resetNavigationState();
+    anchor.blur();
+    return;
+  }
+
   if (isNavigating.value || shouldBypassCustomNavigation(event)) return;
 
   event.preventDefault();

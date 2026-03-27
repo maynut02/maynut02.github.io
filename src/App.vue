@@ -28,12 +28,13 @@ const links = [
   {
     href: "mailto:connect@maynutlab.com",
     texts: ["Connect", "connect@maynutlab.com"],
+    enableNavigateReveal: false,
   },
 ];
 
 const LOADING_TEXT_HIDE_DELAY_MS = 1000;
 const LOADING_OVERLAY_LEAVE_DELAY_MS = 2000;
-const LOADING_OVERLAY_REMOVE_DELAY_MS = 2700;
+const LOADING_OVERLAY_REMOVE_DELAY_MS = 3000;
 
 const showLoadingOverlay = ref(true);
 const showLoadingText = ref(true);
@@ -92,6 +93,7 @@ onUnmounted(() => {
           :key="item.href"
           :href="item.href"
           :texts="item.texts"
+          :enable-navigate-reveal="item.enableNavigateReveal ?? true"
         />
       </div>
     </div>
