@@ -114,7 +114,7 @@ onUnmounted(() => {
         class="inline-flex items-center justify-center px-4 py-1 transition ease-out"
         :duration="5"
       >
-        <span class="pointer-events-none text-3xl">MayNut.</span>
+        <span class="pointer-events-none text-3xl">MayNut</span>
       </RadiantText>
     </Transition>
   </div>

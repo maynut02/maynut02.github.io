@@ -35,6 +35,12 @@ function resetTouchState() {
   isHovered.value = false;
 }
 
+function resetNavigationState() {
+  isNavigating.value = false;
+  navigationOverlayStyle.value = {};
+  window.clearTimeout(navigateTimeoutId);
+}
+
 function shouldBypassCustomNavigation(event: MouseEvent) {
   return event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey;
 }
@@ -64,6 +70,12 @@ function triggerRevealAndNavigate(event: MouseEvent, anchor: HTMLAnchorElement) 
   navigateTimeoutId = window.setTimeout(() => {
     window.location.assign(anchor.href);
   }, NAV_REVEAL_DURATION_MS);
+}
+
+function handlePageShow() {
+  // Covers bfcache restore and normal page show after browser back/forward.
+  resetNavigationState();
+  resetTouchState();
 }
 
 function handleLinkClick(event: MouseEvent) {
@@ -96,11 +108,13 @@ function handleDocumentPointerDown(event: PointerEvent) {
 
 onMounted(() => {
   window.addEventListener("pointerdown", handleDocumentPointerDown, true);
+  window.addEventListener("pageshow", handlePageShow);
 });
 
 onUnmounted(() => {
-  window.clearTimeout(navigateTimeoutId);
+  resetNavigationState();
   window.removeEventListener("pointerdown", handleDocumentPointerDown, true);
+  window.removeEventListener("pageshow", handlePageShow);
 });
 </script>
 
@@ -121,7 +135,7 @@ onUnmounted(() => {
       aria-hidden="true"
       class="absolute inset-0 bg-foreground py-1 origin-center scale-x-0 transition-transform duration-500 ease-out group-hover:scale-x-100 group-focus-within:scale-x-100"
     />
-    <span class="relative z-10 flex h-full items-center py-1 transition-colors duration-1000 group-hover:text-background group-focus-within:text-background">
+    <span class="relative z-10 flex h-full items-center py-1 transition-colors duration-500 group-hover:text-background group-focus-within:text-background">
       <MorphingText class="py-1" :texts="props.texts" :active="isHovered" :morph-time="props.morphTime" />
     </span>
   </a>
