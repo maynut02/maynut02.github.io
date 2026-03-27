@@ -19,7 +19,7 @@ const links = [
   },
   {
     href: "https://arkchess.maynutlab.com",
-    texts: ["위수 협의: 맹약/하반기", "arkchess.maynutlab.com"],
+    texts: ["위수 협의: 맹약/하반기 도감", "arkchess.maynutlab.com"],
   },
   {
     href: "https://thumbnail.maynutlab.com",
