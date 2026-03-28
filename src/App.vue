@@ -1,6 +1,5 @@
 ﻿<script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import StarsBackground from "./components/StarsBackground.vue";
 import MorphingRevealLink from "./components/MorphingRevealLink.vue";
 import RadiantText from "./components/RadiantText.vue";
 import SmoothCursor from "./components/SmoothCursor.vue";
@@ -36,7 +35,7 @@ const userLinks = [
   },
   {
     href: "mailto:connect@maynutlab.com",
-    texts: ["Connect", "connect@maynutlab.com"],
+    texts: ["문의", "connect@maynutlab.com"],
     enableNavigateReveal: false,
   },
 ];
@@ -113,14 +112,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <StarsBackground
-    class="pointer-events-none fixed inset-0 z-0 opacity-70"
-    star-color="#ffffff"
-    :speed="65"
-    :factor="0.035"
-  />
-
-  <main class="relative z-10 flex flex-col min-h-svh w-full pt-20 bg-black/30">
+  <main class="flex flex-col min-h-svh w-full pt-20">
     <div class="relative flex flex-1 items-center justify-center rounded-4xl">
       <div class="flex w-full flex-col text-center text-2xl md:text-4xl">
         <MorphingRevealLink
@@ -131,7 +123,7 @@ onUnmounted(() => {
           :enable-navigate-reveal="item.enableNavigateReveal ?? true"
         />
 
-        <div class="border-y my-4 mx-8 md:mx-16 bg-foreground" />
+        <div class="border-y my-2 md:my-4 mx-4 md:mx-12 bg-foreground" />
 
         <MorphingRevealLink
           v-for="item in userLinks"
@@ -144,7 +136,7 @@ onUnmounted(() => {
     </div>
 
     <div class="flex flex-col gap-2 items-center pb-4 pt-20 text-xs">
-      <span class="text-neutral-600">Copyright 2026. MayNut All rights reserved.</span>
+      <span class="text-neutral-600">© MayNut.</span>
       <div class="flex gap-4 items-center">
         <a 
           v-for="link in footerLinks" 
@@ -171,7 +163,7 @@ onUnmounted(() => {
         class="inline-flex items-center justify-center px-4 py-1 transition ease-out"
         :duration="5"
       >
-        <span class="pointer-events-none text-xl md:text-3xl">MayNut</span>
+        <span class="pointer-events-none text-lg md:text-3xl">MayNut</span>
       </RadiantText>
     </Transition>
   </div>
